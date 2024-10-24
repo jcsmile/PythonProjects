@@ -1,6 +1,9 @@
 import requests
 import csv
 import json
+import time
+from DBAccess import *
+import os
 
 # Function to send a POST request and save the JSON response to CSV
 def download_workday_job_data(api_url: str, job_uri: str, company_name: str, csv_filename: str, headers: dict = None):
@@ -46,15 +49,49 @@ def download_workday_job_data(api_url: str, job_uri: str, company_name: str, csv
             
             for item in jobs:
                 job_title = item['title']
-                job_location = item['locationsText']
+                if 'Intern' in job_title:
+                    continue
+                if 'locationsText' in item:
+                    locationText = item['locationsText']
+                else:
+                    continue
+                
                 job_link = job_uri + item['externalPath']
                 job_department = "N/A"
-                # Append job details to the list
-                jobs_data.append([company_name.strip(), job_title.strip(), job_location.strip(), job_department, job_link])    
-
-        print(f"finished downloading all jobs for company {company_name}")
+                job_location = []
                 
+                # Get job detail for multiple locations
+                if 'Locations' in locationText:
+                    job_detail_url = api_url[:-5] + item['externalPath']
+                    detail_response = requests.get(job_detail_url)
+                    # Check if the request was successful
+                    detail_response.raise_for_status()
+                    job_detail = detail_response.json()['jobPostingInfo']
+                    job_location.append(job_detail['location'])
+                    job_location.extend(job_detail['additionalLocations'])
+                    time.sleep(0.05)
+                else:
+                    job_location.append(locationText)
+                    
+                # Append job details to the list
+                #jobs_data.append([company_name.strip(), job_title.strip(), job_location.strip(), job_department, job_link])    
+                jobs_data.append({
+                    "Company":company_name.strip(),
+                    "Job Title": job_title.strip(),
+                    "Location": job_location,
+                    "Function": job_department,
+                    "Application Link": job_link
+                })
+                
+                # print the last one for debugging
+                #print(jobs_data[-1])
+        print(f"finished downloading all jobs for company {company_name}")
+        
+        # Write data to db
+        write_to_mongo(jobs_data)
+        
         # Open the CSV file for writing
+        '''
         with open(csv_filename, mode='w', newline='', encoding='utf-8') as file:
             # Create a CSV writer object
             writer = csv.writer(file)
@@ -65,6 +102,7 @@ def download_workday_job_data(api_url: str, job_uri: str, company_name: str, csv
             writer.writerows(jobs_data)
 
         print(f"Data successfully saved to {csv_filename}")
+        '''
     
     except requests.exceptions.RequestException as e:
         print(f"HTTP Request failed when fetching page {i}, error: {e} ")
@@ -95,7 +133,7 @@ if __name__ == "__main__":
     # CSV filename where data will be saved
     csv_filename = 'workday_jobs_data.csv'
     
-    
+    MONGO_URI = os.getenv('MONGO_URI')
 
     # Call the function to post the request and save the CSV
     download_workday_job_data(api_url, job_uri, company, csv_filename, headers)

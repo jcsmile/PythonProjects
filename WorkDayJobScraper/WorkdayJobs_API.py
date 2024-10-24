@@ -112,19 +112,44 @@ def download_workday_job_data(api_url: str, job_uri: str, company_name: str, csv
 
 # Example Usage
 if __name__ == "__main__":
-      
     # API endpoint URL
-    api_url = "https://linklogistics.wd5.myworkdayjobs.com/wday/cxs/linklogistics/link/jobs"
-    job_uri = "https://linklogistics.wd5.myworkdayjobs.com/en-US/link"
-    company = "Link Logistics"
-
-    api_url = "https://g6hospitality.wd5.myworkdayjobs.com/wday/cxs/g6hospitality/G6_job_Openings/jobs"
-    job_uri = "https://g6hospitality.wd5.myworkdayjobs.com/en-US/G6_job_Openings"
-    company = "G6 Hospitality"
-    
-    api_url = "https://qtsdatacenters.wd5.myworkdayjobs.com/wday/cxs/qtsdatacenters/qts/jobs"
-    job_uri = "https://qtsdatacenters.wd5.myworkdayjobs.com/en-US/qts"
-    company = "QTS"
+    portofolio_companies = [
+        {
+            "api_url": "https://linklogistics.wd5.myworkdayjobs.com/wday/cxs/linklogistics/link/jobs",
+            "job_uri": "https://linklogistics.wd5.myworkdayjobs.com/en-US/link",
+            "company": "Link Logistics"
+        },
+        {
+            "api_url": "https://g6hospitality.wd5.myworkdayjobs.com/wday/cxs/g6hospitality/G6_job_Openings/jobs",
+            "job_uri": "https://g6hospitality.wd5.myworkdayjobs.com/en-US/G6_job_Openings",
+            "company": "G6 Hospitality"
+        },
+        {
+            "api_url": "https://qtsdatacenters.wd5.myworkdayjobs.com/wday/cxs/qtsdatacenters/qts/jobs",
+            "job_uri": "https://qtsdatacenters.wd5.myworkdayjobs.com/en-US/qts",
+            "company": "QTS"
+        },
+        {
+            "api_url": "https://revantage.wd1.myworkdayjobs.com/wday/cxs/revantage/BRE_Hotels_Resorts/jobs",
+            "job_uri": "https://revantage.wd1.myworkdayjobs.com/en-US/bre",
+            "company": "BRE Hotels"
+        },
+        {
+            "api_url": "https://tricon.wd3.myworkdayjobs.com/wday/cxs/tricon/tricon/jobs",
+            "job_uri": "https://tricon.wd3.myworkdayjobs.com/en-US/tricon",
+            "company": "Tricon"
+        },
+        {
+            "api_url": "https://revantage.wd1.myworkdayjobs.com/wday/cxs/revantage/ShopCore/jobs",
+            "job_uri": "https://revantage.wd1.myworkdayjobs.com/en-US/shopcore",
+            "company": "ShopCore"
+        },
+        {
+            "api_url": "https://revantage.wd1.myworkdayjobs.com/wday/cxs/revantage/Revantage/jobs",
+            "job_uri": "https://revantage.wd1.myworkdayjobs.com/Revantage",
+            "company": "Revantage"
+        }
+    ]
     # API request headers
     headers = {
         "Content-Type": "application/json",
@@ -133,7 +158,8 @@ if __name__ == "__main__":
     # CSV filename where data will be saved
     csv_filename = 'workday_jobs_data.csv'
     
-    MONGO_URI = os.getenv('MONGO_URI')
-
     # Call the function to post the request and save the CSV
-    download_workday_job_data(api_url, job_uri, company, csv_filename, headers)
+    for c in portofolio_companies:
+        download_workday_job_data(c["api_url"], c["job_uri"], c["company"], csv_filename, headers)  
+    
+    

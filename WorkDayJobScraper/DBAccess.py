@@ -7,7 +7,12 @@ def write_to_mongo(documents):
     db_name = 'jobs_db'
     colletion_name = 'job_positions'
     
-    client = pymongo.MongoClient(MONGO_URI)
+    try:
+        client = pymongo.MongoClient(MONGO_URI)
+    # return a friendly error if a URI error is thrown 
+    except pymongo.errors.ConfigurationError:
+        print("An Invalid URI host error was received. Is your Atlas host name correct in your connection string?")
+
     db = client[db_name]
     colletion = db[colletion_name]
     
@@ -25,4 +30,24 @@ def write_to_mongo(documents):
 
     except Exception as e:
         print(f'Failed to write to mongoDB {db_name} colletion {colletion_name}, error: {e}')
-    
+        
+def clean_job_collection():
+
+    try:
+        MONGO_URI = os.getenv('MONGO_URI')
+        db_name = 'jobs_db'
+        colletion_name = 'job_positions'
+        
+        client = pymongo.MongoClient(MONGO_URI)
+        db = client[db_name]
+        colletion = db[colletion_name]
+        
+        colletion.drop()
+  
+    # return a friendly error if a URI error is thrown 
+    except pymongo.errors.ConfigurationError:
+        print("An Invalid URI host error was received. Is your Atlas host name correct in your connection string?")
+    # return a friendly error if an authentication error is thrown
+    except pymongo.errors.OperationFailure:
+        print("An authentication error was received. Are your username and password correct in your connection string?")
+  

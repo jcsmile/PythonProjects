@@ -7,6 +7,10 @@ def write_to_mongo(documents):
     db_name = 'jobs_db'
     colletion_name = 'job_positions'
     
+    if (documents is None) or len(documents) <= 0: 
+        print(f'documents array is a=empty. Nothing to save to db.')
+        return
+    
     try:
         client = pymongo.MongoClient(MONGO_URI)
     # return a friendly error if a URI error is thrown 

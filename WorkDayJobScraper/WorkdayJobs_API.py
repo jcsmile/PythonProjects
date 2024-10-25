@@ -76,11 +76,11 @@ def download_workday_job_data(api_url: str, job_uri: str, company_name: str, csv
                 # Append job details to the list
                 #jobs_data.append([company_name.strip(), job_title.strip(), job_location.strip(), job_department, job_link])    
                 jobs_data.append({
-                    "Company":company_name.strip(),
-                    "Job Title": job_title.strip(),
-                    "Location": job_location,
-                    "Function": job_department,
-                    "Application Link": job_link
+                    "company":company_name.strip(),
+                    "jobTitle": job_title.strip(),
+                    "location": job_location,
+                    "function": job_department,
+                    "applicationLink": job_link
                 })
                 
                 # print the last one for debugging
